@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FraudGuard BD</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --pink: #E2136E; --pink-dark: #B80F59; --pink-soft: #FDE7F1;
+    --ink: #1F1A1D; --muted: #6B6168; --line: #EFE3EA; --bg: #FAF6F8; --card: #FFFFFF;
+    --safe: #1E9E5A; --warn: #E8A317; --fraud: #D7263D;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Hind Siliguri", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: linear-gradient(120deg, var(--pink), var(--pink-dark)); color: #fff; padding: 20px 16px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 0; }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: .3px; }
+  header p { margin: 2px 0 0; opacity: .85; font-size: 14px; }
+  header nav a { color: #fff; text-decoration: none; font-size: 14px; border: 1px solid rgba(255,255,255,.5); padding: 6px 12px; border-radius: 999px; margin-left: 6px; }
+  main { padding: 20px 0 40px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: 0 4px 18px rgba(226,19,110,.05); }
+  .card h2 { margin: 0 0 12px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .dot { width: 8px; height: 8px; background: var(--pink); border-radius: 50%; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 15px; background: #fff; color: var(--ink); }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--pink-soft); border-color: var(--pink); }
+  textarea { min-height: 96px; resize: vertical; }
+  button { background: var(--pink); color: #fff; border: 0; padding: 11px 16px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; }
+  button:hover { background: var(--pink-dark); }
+  button.ghost { background: var(--pink-soft); color: var(--pink-dark); }
+  .row { display: flex; gap: 10px; } .row > * { flex: 1; }
+  .samples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .samples button { padding: 5px 10px; font-size: 12px; font-weight: 500; }
+  .phone { background: var(--pink-soft); border-radius: 14px; padding: 12px; margin-bottom: 4px; }
+  .bubble { background: #fff; border-radius: 12px 12px 12px 2px; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); min-height: 44px; color: var(--muted); }
+  .bubble small { display: block; color: var(--pink-dark); font-weight: 600; margin-bottom: 2px; }
+  .empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+  .score { display: flex; align-items: center; gap: 16px; }
+  .ring { --p: 0; --c: var(--safe); width: 96px; height: 96px; border-radius: 50%; flex: none;
+          background: conic-gradient(var(--c) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; }
+  .ring span { width: 74px; height: 74px; background: #fff; border-radius: 50%; display: grid; place-items: center; font-size: 24px; font-weight: 700; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; color: #fff; }
+  .FRAUD { background: var(--fraud); } .SUSPICIOUS { background: var(--warn); } .SAFE { background: var(--safe); }
+  ul.reasons { padding-left: 18px; margin: 12px 0; font-size: 14px; } ul.reasons li { margin: 4px 0; }
+  .alert { margin-top: 8px; padding: 10px 12px; border-radius: 10px; font-size: 14px; background: #EEF8F2; color: #146C3E; }
+  .alert.none { background: #F4F1F3; color: var(--muted); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .stat b { display: block; font-size: 26px; color: var(--pink); } .stat span { font-size: 13px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; }
+  td.txt { max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; display: none; max-width: 90vw; }
+  .tablewrap { overflow-x: auto; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div><h1>🛡️ FraudGuard BD</h1><p>Scam SMS detection + WhatsApp alerts before you lose money</p></div>
+    <nav><a href="/docs" target="_blank">Swagger</a><a href="/scalar" target="_blank">Scalar</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="stats" id="stats"></div>
+
+  <div class="grid">
+    <section class="card">
+      <h2><span class="dot"></span>📱 Phone Simulator: incoming SMS</h2>
+      <label>Receiving user</label>
+      <select id="user"><option value="">(no user, analyze only)</option></select>
+      <label>From (sender)</label>
+      <input id="sender" value="01899887766" />
+      <label>SMS text</label>
+      <textarea id="text"></textarea>
+      <div class="samples" id="samples"></div>
+      <div style="margin-top:12px"><button id="analyze" style="width:100%">📩 Receive &amp; Analyze SMS</button></div>
+    </section>
+
+    <section class="card" id="result">
+      <h2><span class="dot"></span>🔍 Analysis Result</h2>
+      <div class="empty">Send an SMS to see the risk score.</div>
+    </section>
+
+    <section class="card">
+      <h2><span class="dot"></span>👤 Register user + guardian</h2>
+      <div class="row"><div><label>Name</label><input id="u_name" placeholder="Rahim Uddin" /></div>
+        <div><label>Phone (WhatsApp)</label><input id="u_phone" placeholder="01711223344" /></div></div>
+      <div class="row"><div><label>Guardian name</label><input id="g_name" placeholder="Karim (son)" /></div>
+        <div><label>Guardian WhatsApp</label><input id="g_phone" placeholder="01811223344" /></div></div>
+      <div style="margin-top:12px"><button id="register">Register</button></div>
+    </section>
+
+    <section class="card">
+      <h2><span class="dot"></span>🚩 Report a fraud number</h2>
+      <label>Number</label><input id="r_num" placeholder="01899887766" />
+      <label>Reason</label><input id="r_reason" placeholder="Asked for my PIN" />
+      <div style="margin-top:12px"><button id="report" class="ghost">Report to community</button></div>
+      <div id="blacklist" style="margin-top:10px;font-size:13px;color:var(--muted)"></div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:18px">
+    <h2><span class="dot"></span>📜 Recent messages</h2>
+    <div class="tablewrap"><table><thead><tr><th>Sender</th><th>Message</th><th>Score</th><th>Label</th><th>Alert</th></tr></thead>
+      <tbody id="history"></tbody></table></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const SAMPLES = {
+  "🚨 PIN phishing": ["01899887766", "Apnar bKash account 24 ghontar moddhe block hoye jabe. Ekhoni PIN diye verify korun: bit.ly/bk-verify"],
+  "🚨 Wrong send": ["01755443322", "Vai bhul kore apnar number e 5,000 tk pathiye felsi, please ferot pathan. Allah apnar bhalo korbe"],
+  "🚨 Lottery (Bangla)": ["01633221100", "অভিনন্দন! আপনি বিকাশ লটারিতে ২৫,০০০ টাকা জিতেছেন। টাকা পেতে আপনার পিন নম্বর দিন।"],
+  "✅ Real cash-in": ["bKash", "You have received Tk 500 from 01712345678. Balance Tk 1,200. TrxID 9AB3CD7EF1"],
+  "✅ Friend chat": ["01912345678", "Bhai kal meeting ta 11 tay, office e chole ashben."],
+};
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(() => t.style.display = "none", 3500); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, { headers: { "content-type": "application/json" }, ...opts });
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const det = (body.details || []).map(d => `${d.field}: ${d.issue}`).join("; ");
+    throw new Error(`${body.message || "Request failed"}${det ? " (" + det + ")" : ""}`);
+  }
+  return body;
+}
+
+function renderSamples() {
+  Object.entries(SAMPLES).forEach(([name, [s, t]]) => {
+    const b = document.createElement("button"); b.className = "ghost"; b.textContent = name;
+    b.onclick = () => { $("sender").value = s; $("text").value = t; };
+    $("samples").appendChild(b);
+  });
+  $("text").value = SAMPLES["🚨 PIN phishing"][1];
+}
+
+const COLORS = { FRAUD: "var(--fraud)", SUSPICIOUS: "var(--warn)", SAFE: "var(--safe)" };
+const ALERT_TEXT = {
+  sent: "✅ WhatsApp alert sent to", mocked: "✅ WhatsApp alert (mock mode) delivered to", partial: "⚠️ Alert partially sent to",
+  failed: "❌ WhatsApp alert failed", no_user: "No registered user selected, so no alert was sent", not_needed: "No alert needed",
+};
+
+function renderResult(r) {
+  const alertCls = ["sent", "mocked", "partial"].includes(r.alert_status) ? "alert" : "alert none";
+  $("result").innerHTML = `
+    <h2><span class="dot"></span>🔍 Analysis Result</h2>
+    <div class="score">
+      <div class="ring" style="--p:${r.risk_score};--c:${COLORS[r.label]}"><span>${r.risk_score}</span></div>
+      <div><span class="badge ${r.label}">${r.label}</span>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">ML ${Math.round(r.ml_probability * 100)}% · Rules ${r.rule_score}/100</div></div>
+    </div>
+    <ul class="reasons">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <div class="${alertCls}">${ALERT_TEXT[r.alert_status] || r.alert_status} ${r.alerted.map(esc).join(", ")}</div>`;
+}
+
+async function loadUsers() {
+  const users = await api("/users");
+  const sel = $("user"), cur = sel.value;
+  sel.innerHTML = `<option value="">(no user, analyze only)</option>` +
+    users.map(u => `<option value="${u.phone}">${esc(u.name)} · ${u.phone}${u.guardian_name ? " (guardian: " + esc(u.guardian_name) + ")" : ""}</option>`).join("");
+  sel.value = cur || (users[0] && users[0].phone) || "";
+}
+
+async function loadStats() {
+  const s = await api("/stats");
+  $("stats").innerHTML = [["Messages analyzed", s.total_messages], ["Fraud caught", s.fraud], ["WhatsApp alerts", s.alerts_sent], ["Reported numbers", s.reported_numbers]]
+    .map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join("");
+}
+
+async function loadHistory() {
+  const rows = await api("/messages?limit=10");
+  $("history").innerHTML = rows.length ? rows.map(m => `<tr><td>${esc(m.sender)}</td><td class="txt" title="${esc(m.text)}">${esc(m.text)}</td>
+    <td><b>${m.risk_score}</b></td><td><span class="badge ${m.label}">${m.label}</span></td><td>${m.alert_status}</td></tr>`).join("")
+    : `<tr><td colspan="5" class="empty">No messages yet</td></tr>`;
+}
+
+async function loadBlacklist() {
+  const r = await api("/reports");
+  $("blacklist").innerHTML = r.length ? "Blacklist: " + r.slice(0, 5).map(x => `${x.number} (${x.report_count}×)`).join(", ") : "";
+}
+
+const refresh = () => Promise.all([loadStats(), loadHistory(), loadBlacklist()]).catch(e => toast(e.message));
+
+$("analyze").onclick = async () => {
+  try {
+    const r = await api("/messages/analyze", { method: "POST", body: JSON.stringify({
+      sender: $("sender").value, text: $("text").value, user_phone: $("user").value || null }) });
+    renderResult(r); refresh();
+  } catch (e) { toast(e.message); }
+};
+
+$("register").onclick = async () => {
+  try {
+    const u = await api("/users", { method: "POST", body: JSON.stringify({
+      name: $("u_name").value, phone: $("u_phone").value,
+      guardian_name: $("g_name").value || null, guardian_phone: $("g_phone").value || null }) });
+    toast(`Registered ${u.name}`); await loadUsers(); $("user").value = u.phone; refresh();
+  } catch (e) { toast(e.message); }
+};
+
+$("report").onclick = async () => {
+  try {
+    const r = await api("/reports", { method: "POST", body: JSON.stringify({ number: $("r_num").value, reason: $("r_reason").value || null }) });
+    toast(`${r.number} reported (${r.report_count}×)`); refresh();
+  } catch (e) { toast(e.message); }
+};
+
+renderSamples(); loadUsers().catch(e => toast(e.message)); refresh();
+</script>
+</body>
+</html>
