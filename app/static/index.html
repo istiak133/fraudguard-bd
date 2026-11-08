@@ -4,220 +4,550 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FraudGuard BD</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 7v8c0 7.5 5.1 13.4 12 15 6.9-1.6 12-7.5 12-15V7L16 2z' fill='%23E2136E'/%3E%3Cpath d='m11 16 3.5 3.5L21 13' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --pink: #E2136E; --pink-dark: #B80F59; --pink-soft: #FDE7F1;
-    --ink: #1F1A1D; --muted: #6B6168; --line: #EFE3EA; --bg: #FAF6F8; --card: #FFFFFF;
-    --safe: #1E9E5A; --warn: #E8A317; --fraud: #D7263D;
+    --pink: #E2136E; --pink-deep: #A80D52; --pink-wash: #FCEEF4; --pink-line: #F4D5E3;
+    --ink: #231F20; --ink-2: #4D4D4F; --muted: #8C8C90; --line: #ECECEF;
+    --bg: #F7F7F9; --surface: #FFFFFF; --surface-2: #F5F2F4;
+    --fraud: #C4243C; --fraud-wash: #FBEBEE;
+    --warn: #B97A0E;  --warn-wash: #FBF3E3;
+    --safe: #1F7F56;  --safe-wash: #E8F4EE;
+    --radius: 20px; --shadow: 0 1px 2px rgba(28,18,32,.04), 0 8px 28px -12px rgba(28,18,32,.12);
+    --ease: cubic-bezier(.2,.8,.2,1);
+    --sans: "Poppins", "Hind Siliguri", system-ui, sans-serif;
+    --serif: "Poppins", "Hind Siliguri", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: "Hind Siliguri", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
-  header { background: linear-gradient(120deg, var(--pink), var(--pink-dark)); color: #fff; padding: 20px 16px; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
-  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 0; }
-  header h1 { margin: 0; font-size: 22px; letter-spacing: .3px; }
-  header p { margin: 2px 0 0; opacity: .85; font-size: 14px; }
-  header nav a { color: #fff; text-decoration: none; font-size: 14px; border: 1px solid rgba(255,255,255,.5); padding: 6px 12px; border-radius: 999px; margin-left: 6px; }
-  main { padding: 20px 0 40px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: 0 4px 18px rgba(226,19,110,.05); }
-  .card h2 { margin: 0 0 12px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
-  .card h2 .dot { width: 8px; height: 8px; background: var(--pink); border-radius: 50%; }
-  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
-  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 15px; background: #fff; color: var(--ink); }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--pink-soft); border-color: var(--pink); }
-  textarea { min-height: 96px; resize: vertical; }
-  button { background: var(--pink); color: #fff; border: 0; padding: 11px 16px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; }
-  button:hover { background: var(--pink-dark); }
-  button.ghost { background: var(--pink-soft); color: var(--pink-dark); }
-  .row { display: flex; gap: 10px; } .row > * { flex: 1; }
-  .samples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .samples button { padding: 5px 10px; font-size: 12px; font-weight: 500; }
-  .phone { background: var(--pink-soft); border-radius: 14px; padding: 12px; margin-bottom: 4px; }
-  .bubble { background: #fff; border-radius: 12px 12px 12px 2px; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); min-height: 44px; color: var(--muted); }
-  .bubble small { display: block; color: var(--pink-dark); font-weight: 600; margin-bottom: 2px; }
-  .empty { color: var(--muted); text-align: center; padding: 40px 10px; }
-  .score { display: flex; align-items: center; gap: 16px; }
-  .ring { --p: 0; --c: var(--safe); width: 96px; height: 96px; border-radius: 50%; flex: none;
-          background: conic-gradient(var(--c) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; }
-  .ring span { width: 74px; height: 74px; background: #fff; border-radius: 50%; display: grid; place-items: center; font-size: 24px; font-weight: 700; }
-  .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; color: #fff; }
-  .FRAUD { background: var(--fraud); } .SUSPICIOUS { background: var(--warn); } .SAFE { background: var(--safe); }
-  ul.reasons { padding-left: 18px; margin: 12px 0; font-size: 14px; } ul.reasons li { margin: 4px 0; }
-  .alert { margin-top: 8px; padding: 10px 12px; border-radius: 10px; font-size: 14px; background: #EEF8F2; color: #146C3E; }
-  .alert.none { background: #F4F1F3; color: var(--muted); }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
-  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-  .stat b { display: block; font-size: 26px; color: var(--pink); } .stat span { font-size: 13px; color: var(--muted); }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; }
-  td.txt { max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; display: none; max-width: 90vw; }
-  .tablewrap { overflow-x: auto; }
-  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; font-family: var(--sans); background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.5; }
+  svg { display: block; }
+  button { font: inherit; cursor: pointer; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+
+  /* Header */
+  .top { position: sticky; top: 0; z-index: 20; background: var(--pink); box-shadow: 0 2px 12px rgba(168,13,82,.25); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
+  .brand b { font-weight: 700; font-size: 19px; letter-spacing: -.2px; }
+  .brand span { font-weight: 400; opacity: .9; }
+  .nav { display: flex; gap: 4px; align-items: center; }
+  .nav a { color: #fff; text-decoration: none; font-size: 14px; font-weight: 500; padding: 8px 12px; border-radius: 10px; transition: background .2s, color .2s; }
+  .nav a:hover { background: rgba(255,255,255,.16); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.18); color: #fff; }
+  .pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .pill.live i { background: var(--safe); box-shadow: 0 0 0 0 rgba(31,127,86,.5); animation: pulse 2s infinite; }
+  .pill.mock i { background: #FFD27A; } .pill.live i { background: #7FE0B0; }
+
+  /* Hero */
+  .band { background: linear-gradient(135deg, #E2136E 0%, #C70F60 60%, #A80D52 100%); color: #fff; position: relative; overflow: hidden; padding-bottom: 70px; }
+  .band::before, .band::after { content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.07); }
+  .band::before { width: 520px; height: 520px; right: -140px; top: -220px; }
+  .band::after { width: 300px; height: 300px; left: -120px; bottom: -170px; }
+  .band .curve { position: absolute; left: 0; right: 0; bottom: -1px; height: 48px; background: var(--bg); border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+  .hero { position: relative; z-index: 1; padding: 46px 0 10px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: end; }
+  .eyebrow { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(255,255,255,.18); padding: 5px 12px; border-radius: 999px; }
+  h1 { font-weight: 700; font-size: clamp(28px, 4vw, 42px); line-height: 1.15; letter-spacing: -.6px; margin: 14px 0 12px; }
+  h1 em { font-style: normal; color: #FFD6E7; }
+  .lede { color: rgba(255,255,255,.88); max-width: 520px; margin: 0; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-radius: var(--radius); background: #fff; color: var(--ink); overflow: hidden; box-shadow: 0 16px 36px -16px rgba(60,0,30,.45); }
+  .stat { padding: 14px 16px; border-left: 1px solid var(--line); }
+  .stat:first-child { border-left: 0; }
+  .stat b { display: block; font-weight: 700; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  .stat.accent b { color: var(--pink); }
+
+  /* Layout */
+  .studio { position: relative; z-index: 2; margin-top: -54px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .card-h { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; }
+  .card-h h2 { margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .card-h h2::before { content: ""; width: 4px; height: 16px; border-radius: 4px; background: var(--pink); }
+  .card-h p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+  .card-b { padding: 18px 20px 20px; }
+
+  /* Compose */
+  .compose { display: grid; grid-template-columns: 230px 1fr; gap: 20px; }
+  .phone { background: #2A1420; border-radius: 30px; padding: 10px; box-shadow: 0 18px 40px -18px rgba(28,18,32,.5); align-self: start; }
+  .screen { background: #F3EEF1; border-radius: 22px; overflow: hidden; height: 400px; display: flex; flex-direction: column; }
+  .sbar { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; padding: 8px 16px 4px; color: var(--ink-2); }
+  .thread-h { text-align: center; padding: 6px 10px 10px; border-bottom: 1px solid rgba(0,0,0,.05); background: rgba(255,255,255,.6); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; margin: 0 auto 4px; background: linear-gradient(135deg, #CFC3CA, #A99AA3); display: grid; place-items: center; color: #fff; }
+  .thread-h b { font-size: 12px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .thread { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; overflow: hidden; }
+  .bubble { align-self: flex-start; max-width: 92%; background: #fff; border-radius: 16px 16px 16px 4px; padding: 8px 11px; font-size: 12.5px; line-height: 1.45; color: var(--ink); box-shadow: 0 1px 1px rgba(0,0,0,.04); word-wrap: break-word; transition: box-shadow .4s; }
+  .bubble.arrive { animation: arrive .5s var(--ease); }
+  .bubble.flag-FRAUD { box-shadow: 0 0 0 2px var(--fraud); }
+  .bubble.flag-SUSPICIOUS { box-shadow: 0 0 0 2px var(--warn); }
+  .bubble.flag-SAFE { box-shadow: 0 0 0 2px var(--safe); }
+  .tag { align-self: flex-start; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 6px; display: none; align-items: center; gap: 4px; animation: fade .4s var(--ease); }
+  .tag.show { display: inline-flex; }
+  .meta { font-size: 10px; color: var(--muted); padding-left: 4px; }
+
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px; }
+  .field { margin-bottom: 14px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; font: inherit; font-size: 14px; background: var(--surface); color: var(--ink); transition: border-color .2s, box-shadow .2s; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pink); box-shadow: 0 0 0 4px var(--pink-wash); }
+  textarea { min-height: 112px; resize: vertical; }
+  .hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; display: flex; justify-content: space-between; }
+  kbd { font-family: inherit; font-size: 11px; background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; transition: all .2s var(--ease); }
+  .chip:hover { border-color: var(--pink-line); color: var(--pink-deep); transform: translateY(-1px); }
+  .chip i { width: 6px; height: 6px; border-radius: 50%; }
+
+  .btn { border: 0; border-radius: 999px; padding: 12px 18px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform .15s var(--ease), background .2s, box-shadow .2s; }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--pink); color: #fff; box-shadow: 0 8px 20px -10px rgba(226,19,110,.7); }
+  .btn-primary:hover { background: var(--pink-deep); }
+  .btn-primary[disabled] { opacity: .7; cursor: progress; }
+  .btn-soft { background: #fff; color: var(--pink); box-shadow: inset 0 0 0 1.5px var(--pink); }
+  .btn-soft:hover { background: var(--pink); color: #fff; }
+  .btn-block { width: 100%; }
+  .spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: rot .7s linear infinite; }
+
+  /* Verdict */
+  .verdict { position: relative; min-height: 100%; }
+  .empty { display: grid; place-items: center; text-align: center; padding: 70px 30px; color: var(--muted); }
+  .empty svg { margin-bottom: 14px; color: var(--pink-line); }
+  .empty h3 { margin: 0 0 4px; color: var(--ink); font-size: 16px; }
+  .empty p { margin: 0; font-size: 13.5px; max-width: 280px; }
+  .v-top { display: flex; align-items: center; gap: 22px; }
+  .dial { position: relative; width: 132px; height: 132px; flex: none; }
+  .dial circle { fill: none; stroke-width: 10; }
+  .dial .track { stroke: var(--surface-2); }
+  .dial .bar { stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1.1s var(--ease), stroke .3s; }
+  .dial .num { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+  .dial .num b { font-weight: 700; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .dial .num small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; letter-spacing: .08em; padding: 6px 12px; border-radius: 999px; }
+  .label.FRAUD, .tag.FRAUD { background: var(--fraud-wash); color: var(--fraud); }
+  .label.SUSPICIOUS, .tag.SUSPICIOUS { background: var(--warn-wash); color: var(--warn); }
+  .label.SAFE, .tag.SAFE { background: var(--safe-wash); color: var(--safe); }
+  .v-title { font-weight: 600; font-size: 22px; margin: 10px 0 4px; line-height: 1.2; }
+  .v-sub { font-size: 13px; color: var(--muted); }
+  .bars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 22px 0 6px; }
+  .meter span { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); font-weight: 600; margin-bottom: 6px; }
+  .meter div { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+  .meter div i { display: block; height: 100%; width: 0; background: var(--ink); border-radius: 99px; transition: width 1s var(--ease) .2s; }
+  .section-t { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+  .reasons { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .reasons li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; opacity: 0; transform: translateY(6px); animation: rise .45s var(--ease) forwards; }
+  .reasons li svg { flex: none; margin-top: 2px; color: var(--pink); }
+  .steps { display: grid; gap: 0; }
+  .step { display: flex; gap: 12px; align-items: flex-start; position: relative; padding-bottom: 14px; opacity: .35; transition: opacity .4s; }
+  .step.on { opacity: 1; }
+  .step:not(:last-child)::after { content: ""; position: absolute; left: 11px; top: 26px; bottom: 2px; width: 2px; background: var(--line); }
+  .step .ic { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--surface-2); color: var(--muted); transition: background .3s, color .3s, transform .3s var(--ease); }
+  .step.on .ic { background: var(--ink); color: #fff; transform: scale(1.05); }
+  .step.ok .ic { background: var(--safe); }
+  .step.bad .ic { background: var(--fraud); }
+  .step b { font-size: 13.5px; display: block; }
+  .step small { font-size: 12.5px; color: var(--muted); }
+
+  /* Lower */
+  .lower { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; margin: 20px 0 48px; }
+  .tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 12px; }
+  .tab { border: 0; background: transparent; padding: 7px 12px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--muted); transition: all .2s; }
+  .tab.active { background: var(--pink); color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .list { display: grid; }
+  .row { display: grid; grid-template-columns: 110px 1fr 52px 104px; gap: 12px; align-items: center; padding: 12px 4px; border-bottom: 1px solid var(--line); font-size: 13.5px; animation: fade .4s var(--ease); }
+  .row:last-child { border-bottom: 0; }
+  .row .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+  .row .s { font-weight: 700; font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+  .row .mono { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .row .label { justify-self: end; font-size: 10.5px; padding: 4px 9px; }
+  .none { color: var(--muted); font-size: 13.5px; padding: 26px 4px; text-align: center; }
+  .seg { display: flex; gap: 4px; margin-bottom: 16px; background: var(--surface-2); padding: 4px; border-radius: 12px; }
+  .seg button { flex: 1; border: 0; background: transparent; padding: 8px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all .2s; }
+  .seg button.active { background: var(--pink); color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .pane { display: none; animation: fade .3s var(--ease); }
+  .pane.active { display: block; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .err { color: var(--fraud); font-size: 12px; margin-top: 5px; display: none; }
+  .invalid input { border-color: var(--fraud); }
+  .invalid .err { display: block; }
+
+  /* Toast */
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 14px; font-size: 13.5px; display: flex; gap: 10px; align-items: center; box-shadow: 0 16px 40px -12px rgba(0,0,0,.4); transition: all .35s var(--ease); max-width: calc(100vw - 32px); z-index: 50; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast.error svg { color: #FF8FA3; } .toast.ok svg { color: #7FE0B0; }
+
+  footer { background: #A80D52; color: rgba(255,255,255,.85); padding: 22px 0 26px; font-size: 12.5px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @keyframes arrive { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(31,127,86,.45); } 70% { box-shadow: 0 0 0 7px rgba(31,127,86,0); } 100% { box-shadow: 0 0 0 0 rgba(31,127,86,0); } }
+  .shake { animation: shake .4s; }
+  @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+  @media (max-width: 1020px) { .studio, .lower, .hero { grid-template-columns: 1fr; } .hero { align-items: start; } .band { padding-bottom: 80px; } }
+  @media (max-width: 620px) {
+    .compose { grid-template-columns: 1fr; } .phone { max-width: 260px; margin: 0 auto; } .screen { height: 340px; }
+    .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .row { grid-template-columns: 1fr 60px; } .row .t, .row .s { display: none; }
+    .nav a.hide-sm { display: none; } .v-top { flex-direction: column; align-items: flex-start; } .bars { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
 </head>
 <body>
-<header>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5.2 3.4 9.4 8 10.5 4.6-1.1 8-5.3 8-10.5v-6L12 2z" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 8v5m0 3.5v.01M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></symbol>
+  <symbol id="i-rules" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2v3m4-3v3m-4 14v3m4-3v3M2 10h3m-3 4h3m14-4h3m-3 4h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.2 2.5 3.6 5.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 19.5 5.3 15.6A8 8 0 1 1 8.5 18.8L4 19.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c.9-4 4-6.5 8-6.5s7.1 2.5 8 6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7-7-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 64 64"><rect x="8" y="14" width="48" height="36" rx="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="m8 22 24 15 24-15" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="top">
   <div class="wrap">
-    <div><h1>🛡️ FraudGuard BD</h1><p>Scam SMS detection + WhatsApp alerts before you lose money</p></div>
-    <nav><a href="/docs" target="_blank">Swagger</a><a href="/scalar" target="_blank">Scalar</a></nav>
+    <a class="brand" href="/">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5.1 13.4 12 15 6.9-1.6 12-7.5 12-15V7L16 2z" fill="#fff"/><path d="m11 16 3.5 3.5L21 13" stroke="#E2136E" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>FraudGuard<span> BD</span></b>
+    </a>
+    <nav class="nav">
+      <span class="pill" id="mode"><i></i><span>Checking</span></span>
+      <a href="/docs" target="_blank" class="hide-sm">Swagger</a>
+      <a href="/scalar" target="_blank" class="hide-sm">Scalar</a>
+      <a href="https://github.com/istiak133/fraudguard-bd" target="_blank">GitHub</a>
+    </nav>
   </div>
 </header>
 
+<div class="band"><div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Scam SMS protection</div>
+      <h1>Stop the scam <em>before</em> the money moves.</h1>
+      <p class="lede">Every incoming SMS is scored by a local ML model and an explainable rule engine. If it's fraud, the user and a family guardian are warned on WhatsApp right away.</p>
+    </div>
+    <div class="stats" id="stats">
+      <div class="stat"><b data-k="total_messages">0</b><span>Analyzed</span></div>
+      <div class="stat accent"><b data-k="fraud">0</b><span>Fraud caught</span></div>
+      <div class="stat"><b data-k="alerts_sent">0</b><span>WhatsApp alerts</span></div>
+      <div class="stat"><b data-k="reported_numbers">0</b><span>Reported numbers</span></div>
+    </div>
+  </section>
+</div><div class="curve"></div></div>
+
 <main class="wrap">
-  <div class="stats" id="stats"></div>
 
-  <div class="grid">
-    <section class="card">
-      <h2><span class="dot"></span>📱 Phone Simulator: incoming SMS</h2>
-      <label>Receiving user</label>
-      <select id="user"><option value="">(no user, analyze only)</option></select>
-      <label>From (sender)</label>
-      <input id="sender" value="01899887766" />
-      <label>SMS text</label>
-      <textarea id="text"></textarea>
-      <div class="samples" id="samples"></div>
-      <div style="margin-top:12px"><button id="analyze" style="width:100%">📩 Receive &amp; Analyze SMS</button></div>
-    </section>
+  <section class="studio">
+    <div class="card">
+      <div class="card-h"><div><h2>Incoming message</h2><p>Simulate an SMS arriving on the user's phone</p></div></div>
+      <div class="card-b compose">
+        <div class="phone" aria-hidden="true">
+          <div class="screen">
+            <div class="sbar"><span id="clock">9:41</span><span>4G</span></div>
+            <div class="thread-h"><div class="avatar"><svg width="18" height="18"><use href="#i-user"/></svg></div><b id="p-sender">01899887766</b></div>
+            <div class="thread" id="thread">
+              <div class="bubble" id="p-bubble"></div>
+              <div class="meta" id="p-meta">Now</div>
+              <div class="tag" id="p-tag"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="field"><label for="user">Received by</label><select id="user"><option value="">Anonymous, no alert</option></select></div>
+          <div class="field"><label for="sender">From</label><input id="sender" value="01899887766" autocomplete="off" /></div>
+          <div class="field">
+            <label for="text">Message</label>
+            <textarea id="text"></textarea>
+            <div class="hint"><span id="count">0 / 1000</span><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to analyze</span></div>
+          </div>
+          <div class="field"><label>Try a sample</label><div class="chips" id="samples"></div></div>
+          <button class="btn btn-primary btn-block" id="analyze"><svg width="16" height="16"><use href="#i-send"/></svg><span>Analyze message</span></button>
+        </div>
+      </div>
+    </div>
 
-    <section class="card" id="result">
-      <h2><span class="dot"></span>🔍 Analysis Result</h2>
-      <div class="empty">Send an SMS to see the risk score.</div>
-    </section>
+    <div class="card verdict" id="verdict">
+      <div class="empty">
+        <div>
+          <svg width="64" height="64"><use href="#i-inbox"/></svg>
+          <h3>Waiting for a message</h3>
+          <p>Pick a sample or type your own SMS, then analyze it to see the risk score, reasons and alert status.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section class="card">
-      <h2><span class="dot"></span>👤 Register user + guardian</h2>
-      <div class="row"><div><label>Name</label><input id="u_name" placeholder="Rahim Uddin" /></div>
-        <div><label>Phone (WhatsApp)</label><input id="u_phone" placeholder="01711223344" /></div></div>
-      <div class="row"><div><label>Guardian name</label><input id="g_name" placeholder="Karim (son)" /></div>
-        <div><label>Guardian WhatsApp</label><input id="g_phone" placeholder="01811223344" /></div></div>
-      <div style="margin-top:12px"><button id="register">Register</button></div>
-    </section>
+  <section class="lower">
+    <div class="card">
+      <div class="card-h">
+        <div><h2>Recent activity</h2><p>Latest analyzed messages</p></div>
+        <div class="tabs" id="filters">
+          <button class="tab active" data-f="">All</button><button class="tab" data-f="FRAUD">Fraud</button>
+          <button class="tab" data-f="SUSPICIOUS">Suspicious</button><button class="tab" data-f="SAFE">Safe</button>
+        </div>
+      </div>
+      <div class="card-b"><div class="list" id="history"></div></div>
+    </div>
 
-    <section class="card">
-      <h2><span class="dot"></span>🚩 Report a fraud number</h2>
-      <label>Number</label><input id="r_num" placeholder="01899887766" />
-      <label>Reason</label><input id="r_reason" placeholder="Asked for my PIN" />
-      <div style="margin-top:12px"><button id="report" class="ghost">Report to community</button></div>
-      <div id="blacklist" style="margin-top:10px;font-size:13px;color:var(--muted)"></div>
-    </section>
-  </div>
-
-  <section class="card" style="margin-top:18px">
-    <h2><span class="dot"></span>📜 Recent messages</h2>
-    <div class="tablewrap"><table><thead><tr><th>Sender</th><th>Message</th><th>Score</th><th>Label</th><th>Alert</th></tr></thead>
-      <tbody id="history"></tbody></table></div>
+    <div class="card">
+      <div class="card-b">
+        <div class="seg">
+          <button class="active" data-p="p-reg"><svg width="15" height="15"><use href="#i-users"/></svg>Protect someone</button>
+          <button data-p="p-rep"><svg width="15" height="15"><use href="#i-flag"/></svg>Report number</button>
+        </div>
+        <form class="pane active" id="p-reg" novalidate>
+          <div class="two">
+            <div class="field" data-f="name"><label>Name</label><input name="name" placeholder="Rahim Uddin" /><div class="err"></div></div>
+            <div class="field" data-f="phone"><label>WhatsApp number</label><input name="phone" placeholder="01711223344" inputmode="tel" /><div class="err"></div></div>
+            <div class="field" data-f="guardian_name"><label>Guardian name</label><input name="guardian_name" placeholder="Karim (son)" /><div class="err"></div></div>
+            <div class="field" data-f="guardian_phone"><label>Guardian WhatsApp</label><input name="guardian_phone" placeholder="01811223344" inputmode="tel" /><div class="err"></div></div>
+          </div>
+          <button class="btn btn-soft btn-block" type="submit">Register for alerts</button>
+        </form>
+        <form class="pane" id="p-rep" novalidate>
+          <div class="field" data-f="number"><label>Suspicious number</label><input name="number" placeholder="01899887766" inputmode="tel" /><div class="err"></div></div>
+          <div class="field" data-f="reason"><label>What happened? <span style="color:var(--muted);font-weight:500">(optional)</span></label><input name="reason" placeholder="Asked for my PIN" /><div class="err"></div></div>
+          <button class="btn btn-soft btn-block" type="submit">Report to community</button>
+          <div class="section-t">Most reported</div>
+          <div class="list" id="blacklist"></div>
+        </form>
+      </div>
+    </div>
   </section>
 </main>
-<div class="toast" id="toast"></div>
+
+<footer><div class="wrap"><span>FraudGuard BD · Local ML + rules + community signals</span><span>bKash and Nagad never ask for your PIN or OTP.</span></div></footer>
+<div class="toast" id="toast"><svg width="18" height="18"><use href="#i-check"/></svg><span></span></div>
 
 <script>
-const $ = (id) => document.getElementById(id);
-const SAMPLES = {
-  "🚨 PIN phishing": ["01899887766", "Apnar bKash account 24 ghontar moddhe block hoye jabe. Ekhoni PIN diye verify korun: bit.ly/bk-verify"],
-  "🚨 Wrong send": ["01755443322", "Vai bhul kore apnar number e 5,000 tk pathiye felsi, please ferot pathan. Allah apnar bhalo korbe"],
-  "🚨 Lottery (Bangla)": ["01633221100", "অভিনন্দন! আপনি বিকাশ লটারিতে ২৫,০০০ টাকা জিতেছেন। টাকা পেতে আপনার পিন নম্বর দিন।"],
-  "✅ Real cash-in": ["bKash", "You have received Tk 500 from 01712345678. Balance Tk 1,200. TrxID 9AB3CD7EF1"],
-  "✅ Friend chat": ["01912345678", "Bhai kal meeting ta 11 tay, office e chole ashben."],
-};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const icon = (id, s = 16) => `<svg width="${s}" height="${s}"><use href="#i-${id}"/></svg>`;
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function toast(msg) { const t = $("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(() => t.style.display = "none", 3500); }
-function esc(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+const SAMPLES = [
+  ["PIN phishing", "fraud", "01899887766", "Apnar bKash account 24 ghontar moddhe block hoye jabe. Ekhoni PIN diye verify korun: bit.ly/bk-verify"],
+  ["Sent by mistake", "fraud", "01755443322", "Vai bhul kore apnar number e 5,000 tk pathiye felsi, please ferot pathan. Allah apnar bhalo korbe"],
+  ["Lottery", "fraud", "01633221100", "অভিনন্দন! আপনি বিকাশ লটারিতে ২৫,০০০ টাকা জিতেছেন। টাকা পেতে আপনার পিন নম্বর দিন।"],
+  ["Real cash-in", "safe", "bKash", "You have received Tk 500 from 01712345678. Balance Tk 1,200. TrxID 9AB3CD7EF1"],
+  ["Friend", "safe", "01912345678", "Bhai kal meeting ta 11 tay, office e chole ashben."],
+];
+const TONE = { FRAUD: "var(--fraud)", SUSPICIOUS: "var(--warn)", SAFE: "var(--safe)" };
+const TITLE = { FRAUD: "This message is a scam", SUSPICIOUS: "Be careful with this message", SAFE: "This message looks safe" };
+
+let toastTimer;
+function toast(msg, kind = "ok") {
+  const t = $("#toast");
+  t.className = `toast ${kind} show`;
+  t.querySelector("use").setAttribute("href", kind === "ok" ? "#i-check" : "#i-alert");
+  t.querySelector("span").textContent = msg;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 3600);
+}
 
 async function api(path, opts = {}) {
   const r = await fetch(path, { headers: { "content-type": "application/json" }, ...opts });
   const body = await r.json().catch(() => ({}));
-  if (!r.ok) {
-    const det = (body.details || []).map(d => `${d.field}: ${d.issue}`).join("; ");
-    throw new Error(`${body.message || "Request failed"}${det ? " (" + det + ")" : ""}`);
-  }
+  if (!r.ok) { const e = new Error(body.message || "Request failed"); e.details = body.details || []; throw e; }
   return body;
 }
 
+function countUp(el, to, dur = 900) {
+  const from = +el.dataset.v || 0; el.dataset.v = to;
+  if (reduced || from === to) { el.textContent = to; return; }
+  const t0 = performance.now();
+  const tick = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * e); if (p < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
+/* Phone preview */
+function syncPreview(arrive = false) {
+  const text = $("#text").value.trim(), sender = $("#sender").value.trim();
+  $("#p-sender").textContent = sender || "Unknown";
+  const b = $("#p-bubble");
+  b.textContent = text || "Message preview";
+  b.style.color = text ? "" : "var(--muted)";
+  b.className = "bubble";
+  $("#p-tag").className = "tag";
+  if (arrive) { void b.offsetWidth; b.classList.add("arrive"); }
+  $("#count").textContent = `${$("#text").value.length} / 1000`;
+}
+function flagPreview(label) {
+  $("#p-bubble").classList.add(`flag-${label}`);
+  const tag = $("#p-tag");
+  tag.className = `tag show ${label}`;
+  tag.innerHTML = icon(label === "SAFE" ? "check" : "alert", 11) + (label === "SAFE" ? "Looks safe" : label === "FRAUD" ? "Scam detected" : "Suspicious");
+}
+
 function renderSamples() {
-  Object.entries(SAMPLES).forEach(([name, [s, t]]) => {
-    const b = document.createElement("button"); b.className = "ghost"; b.textContent = name;
-    b.onclick = () => { $("sender").value = s; $("text").value = t; };
-    $("samples").appendChild(b);
+  $("#samples").innerHTML = SAMPLES.map(([n, k], i) =>
+    `<button class="chip" data-i="${i}"><i style="background:${k === "fraud" ? "var(--fraud)" : "var(--safe)"}"></i>${n}</button>`).join("");
+  $("#samples").onclick = (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    const [, , s, t] = SAMPLES[b.dataset.i];
+    $("#sender").value = s; $("#text").value = t; syncPreview(true);
+  };
+  $("#sender").value = SAMPLES[0][2]; $("#text").value = SAMPLES[0][3]; syncPreview();
+}
+
+/* Verdict */
+function stepHtml(id, ic, title, sub) {
+  return `<div class="step" id="${id}"><div class="ic">${icon(ic, 13)}</div><div><b>${title}</b><small>${sub}</small></div></div>`;
+}
+
+async function renderVerdict(r) {
+  const C = 2 * Math.PI * 56;
+  const alerted = ["sent", "mocked", "partial"].includes(r.alert_status);
+  const alertSub = {
+    sent: `Delivered to ${r.alerted.length} recipient${r.alerted.length > 1 ? "s" : ""}`,
+    mocked: `Delivered in demo mode to ${r.alerted.length} recipient${r.alerted.length > 1 ? "s" : ""}`,
+    partial: "Delivered to some recipients", failed: "Delivery failed, analysis saved",
+    no_user: "No registered recipient for this message", not_needed: "Not needed for this risk level",
+  }[r.alert_status] || r.alert_status;
+  const ml = Math.round(r.ml_probability * 100);
+
+  $("#verdict").innerHTML = `
+    <div class="card-h"><div><h2>Verdict</h2><p>Message #${r.message_id}</p></div><span class="label ${r.label}">${icon(r.label === "SAFE" ? "check" : "alert", 12)}${r.label}</span></div>
+    <div class="card-b">
+      <div class="v-top">
+        <div class="dial">
+          <svg width="132" height="132" viewBox="0 0 132 132"><circle class="track" cx="66" cy="66" r="56"/>
+            <circle class="bar" cx="66" cy="66" r="56" stroke="${TONE[r.label]}" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>
+          <div class="num"><div><b id="v-num">0</b><small>risk / 100</small></div></div>
+        </div>
+        <div>
+          <div class="v-title">${TITLE[r.label]}</div>
+          <div class="v-sub">${r.label === "FRAUD" ? "Do not share your PIN or OTP, don't open links, and don't send money." :
+            r.label === "SUSPICIOUS" ? "Some warning signs found. Verify through the official app before acting." :
+            "No strong scam signals found in this message."}</div>
+        </div>
+      </div>
+      <div class="bars">
+        <div class="meter"><span>Model<em style="font-style:normal">${ml}%</em></span><div><i data-w="${ml}"></i></div></div>
+        <div class="meter"><span>Rules<em style="font-style:normal">${r.rule_score}</em></span><div><i data-w="${r.rule_score}"></i></div></div>
+      </div>
+      <div class="section-t">Why</div>
+      <ul class="reasons">${r.reasons.map((x, i) => `<li style="animation-delay:${.15 + i * .08}s">${icon("dot", 14)}<span>${esc(x)}</span></li>`).join("")}</ul>
+      <div class="section-t">Pipeline</div>
+      <div class="steps">
+        ${stepHtml("s1", "rules", "Rule engine", `${r.rule_score} risk points from red flags`)}
+        ${stepHtml("s2", "cpu", "Local ML model", `${ml}% similar to known scams`)}
+        ${stepHtml("s3", "shield", "Decision", `Scored ${r.risk_score} / 100, labelled ${r.label.toLowerCase()}`)}
+        ${stepHtml("s4", "chat", "WhatsApp alert", esc(alertSub))}
+      </div>
+    </div>`;
+
+  requestAnimationFrame(() => {
+    $(".dial .bar").style.strokeDashoffset = C * (1 - r.risk_score / 100);
+    $$(".meter i").forEach(i => i.style.width = i.dataset.w + "%");
+    countUp($("#v-num"), r.risk_score, 1000);
   });
-  $("text").value = SAMPLES["🚨 PIN phishing"][1];
+  for (const [i, id] of ["s1", "s2", "s3", "s4"].entries()) {
+    await sleep(reduced ? 0 : 260);
+    const el = $("#" + id); el.classList.add("on");
+    if (id === "s3") el.classList.add(r.label === "SAFE" ? "ok" : "bad");
+    if (id === "s4" && alerted) el.classList.add("ok");
+  }
 }
 
-const COLORS = { FRAUD: "var(--fraud)", SUSPICIOUS: "var(--warn)", SAFE: "var(--safe)" };
-const ALERT_TEXT = {
-  sent: "✅ WhatsApp alert sent to", mocked: "✅ WhatsApp alert (mock mode) delivered to", partial: "⚠️ Alert partially sent to",
-  failed: "❌ WhatsApp alert failed", no_user: "No registered user selected, so no alert was sent", not_needed: "No alert needed",
-};
-
-function renderResult(r) {
-  const alertCls = ["sent", "mocked", "partial"].includes(r.alert_status) ? "alert" : "alert none";
-  $("result").innerHTML = `
-    <h2><span class="dot"></span>🔍 Analysis Result</h2>
-    <div class="score">
-      <div class="ring" style="--p:${r.risk_score};--c:${COLORS[r.label]}"><span>${r.risk_score}</span></div>
-      <div><span class="badge ${r.label}">${r.label}</span>
-        <div style="font-size:13px;color:var(--muted);margin-top:6px">ML ${Math.round(r.ml_probability * 100)}% · Rules ${r.rule_score}/100</div></div>
-    </div>
-    <ul class="reasons">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    <div class="${alertCls}">${ALERT_TEXT[r.alert_status] || r.alert_status} ${r.alerted.map(esc).join(", ")}</div>`;
+/* Data */
+let filter = "";
+async function loadHistory() {
+  const rows = await api(`/messages?limit=8${filter ? "&label=" + filter : ""}`);
+  $("#history").innerHTML = rows.length ? rows.map(m => `
+    <div class="row"><span class="mono">${esc(m.sender)}</span><span class="t" title="${esc(m.text)}">${esc(m.text)}</span>
+    <span class="s">${m.risk_score}</span><span class="label ${m.label}">${m.label}</span></div>`).join("")
+    : `<div class="none">No messages here yet.</div>`;
 }
-
-async function loadUsers() {
-  const users = await api("/users");
-  const sel = $("user"), cur = sel.value;
-  sel.innerHTML = `<option value="">(no user, analyze only)</option>` +
-    users.map(u => `<option value="${u.phone}">${esc(u.name)} · ${u.phone}${u.guardian_name ? " (guardian: " + esc(u.guardian_name) + ")" : ""}</option>`).join("");
-  sel.value = cur || (users[0] && users[0].phone) || "";
-}
-
 async function loadStats() {
   const s = await api("/stats");
-  $("stats").innerHTML = [["Messages analyzed", s.total_messages], ["Fraud caught", s.fraud], ["WhatsApp alerts", s.alerts_sent], ["Reported numbers", s.reported_numbers]]
-    .map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join("");
+  $$("#stats b").forEach(b => countUp(b, s[b.dataset.k]));
 }
-
-async function loadHistory() {
-  const rows = await api("/messages?limit=10");
-  $("history").innerHTML = rows.length ? rows.map(m => `<tr><td>${esc(m.sender)}</td><td class="txt" title="${esc(m.text)}">${esc(m.text)}</td>
-    <td><b>${m.risk_score}</b></td><td><span class="badge ${m.label}">${m.label}</span></td><td>${m.alert_status}</td></tr>`).join("")
-    : `<tr><td colspan="5" class="empty">No messages yet</td></tr>`;
-}
-
 async function loadBlacklist() {
   const r = await api("/reports");
-  $("blacklist").innerHTML = r.length ? "Blacklist: " + r.slice(0, 5).map(x => `${x.number} (${x.report_count}×)`).join(", ") : "";
+  $("#blacklist").innerHTML = r.length ? r.slice(0, 4).map(x =>
+    `<div class="row" style="grid-template-columns:1fr auto"><span class="mono">${esc(x.number)}</span><span class="label FRAUD">${x.report_count} report${x.report_count > 1 ? "s" : ""}</span></div>`).join("")
+    : `<div class="none">No reports yet.</div>`;
+}
+async function loadUsers(select) {
+  const users = await api("/users"), sel = $("#user"), cur = select || sel.value;
+  sel.innerHTML = `<option value="">Anonymous, no alert</option>` + users.map(u =>
+    `<option value="${u.phone}">${esc(u.name)} · ${u.phone}${u.guardian_name ? " + " + esc(u.guardian_name) : ""}</option>`).join("");
+  sel.value = cur || (users[0]?.phone ?? "");
+}
+async function loadHealth() {
+  try { const h = await api("/health"), live = h.whatsapp_mode === "live";
+    $("#mode").className = "pill " + (live ? "live" : "mock");
+    $("#mode span").textContent = live ? "WhatsApp live" : "WhatsApp demo mode";
+  } catch { $("#mode span").textContent = "Offline"; }
+}
+const refresh = () => Promise.all([loadStats(), loadHistory(), loadBlacklist()]).catch(e => toast(e.message, "error"));
+
+/* Actions */
+async function analyze() {
+  const btn = $("#analyze"), label = btn.querySelector("span");
+  if (btn.disabled) return;
+  btn.disabled = true; btn.querySelector("svg").outerHTML = `<i class="spin"></i>`; label.textContent = "Analyzing";
+  syncPreview(true);
+  try {
+    const [r] = await Promise.all([
+      api("/messages/analyze", { method: "POST", body: JSON.stringify({ sender: $("#sender").value, text: $("#text").value, user_phone: $("#user").value || null }) }),
+      sleep(reduced ? 0 : 450),
+    ]);
+    flagPreview(r.label); renderVerdict(r); refresh();
+    if (r.label === "FRAUD" && r.alerted.length) toast(`WhatsApp warning sent to ${r.alerted.length} contact${r.alerted.length > 1 ? "s" : ""}`);
+  } catch (e) {
+    const d = e.details?.map(x => `${x.field}: ${x.issue.replace("Value error, ", "")}`).join(" · ");
+    toast(d || e.message, "error"); $("#analyze").closest(".card").classList.add("shake");
+    setTimeout(() => $(".shake")?.classList.remove("shake"), 450);
+  } finally {
+    btn.disabled = false; btn.querySelector(".spin").outerHTML = icon("send"); label.textContent = "Analyze message";
+  }
 }
 
-const refresh = () => Promise.all([loadStats(), loadHistory(), loadBlacklist()]).catch(e => toast(e.message));
+function bindForm(form, path, done) {
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    $$(".field", form).forEach(f => f.classList.remove("invalid"));
+    const data = Object.fromEntries([...new FormData(form)].map(([k, v]) => [k, v.trim() || null]));
+    try { const r = await api(path, { method: "POST", body: JSON.stringify(data) }); form.reset(); done(r); }
+    catch (err) {
+      let shown = false;
+      (err.details || []).forEach(d => { const f = $(`.field[data-f="${d.field}"]`, form);
+        if (f) { f.classList.add("invalid"); $(".err", f).textContent = d.issue.replace("Value error, ", ""); shown = true; } });
+      if (!shown) toast(err.message, "error");
+    }
+  };
+}
 
-$("analyze").onclick = async () => {
-  try {
-    const r = await api("/messages/analyze", { method: "POST", body: JSON.stringify({
-      sender: $("sender").value, text: $("text").value, user_phone: $("user").value || null }) });
-    renderResult(r); refresh();
-  } catch (e) { toast(e.message); }
-};
+bindForm($("#p-reg"), "/users", async (u) => { toast(`${u.name} is now protected`); await loadUsers(u.phone); refresh(); });
+bindForm($("#p-rep"), "/reports", (r) => { toast(`${r.number} reported (${r.report_count} total)`); refresh(); });
 
-$("register").onclick = async () => {
-  try {
-    const u = await api("/users", { method: "POST", body: JSON.stringify({
-      name: $("u_name").value, phone: $("u_phone").value,
-      guardian_name: $("g_name").value || null, guardian_phone: $("g_phone").value || null }) });
-    toast(`Registered ${u.name}`); await loadUsers(); $("user").value = u.phone; refresh();
-  } catch (e) { toast(e.message); }
-};
+$("#analyze").onclick = analyze;
+$("#text").addEventListener("input", () => syncPreview());
+$("#sender").addEventListener("input", () => syncPreview());
+document.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") analyze(); });
+$("#filters").onclick = (e) => { const b = e.target.closest(".tab"); if (!b) return;
+  $$("#filters .tab").forEach(t => t.classList.toggle("active", t === b)); filter = b.dataset.f; loadHistory(); };
+$$(".seg button").forEach(b => b.onclick = () => {
+  $$(".seg button").forEach(x => x.classList.toggle("active", x === b));
+  $$(".pane").forEach(p => p.classList.toggle("active", p.id === b.dataset.p));
+});
+const tickClock = () => $("#clock").textContent = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+tickClock(); setInterval(tickClock, 30000);
 
-$("report").onclick = async () => {
-  try {
-    const r = await api("/reports", { method: "POST", body: JSON.stringify({ number: $("r_num").value, reason: $("r_reason").value || null }) });
-    toast(`${r.number} reported (${r.report_count}×)`); refresh();
-  } catch (e) { toast(e.message); }
-};
-
-renderSamples(); loadUsers().catch(e => toast(e.message)); refresh();
+renderSamples(); loadHealth(); loadUsers().catch(() => {}); refresh();
 </script>
 </body>
 </html>

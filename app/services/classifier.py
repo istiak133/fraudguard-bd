@@ -14,11 +14,15 @@ def load_model(path=MODEL_PATH):
     """Load the trained model; trains one on the fly if the file is missing."""
     global _model
     if path.exists():
-        _model = joblib.load(path)
+        try:
+            _model = joblib.load(path)
+            return _model
+        except Exception as exc:  # e.g. pickle from a different Python/sklearn version
+            log.warning("Could not load model (%s), retraining...", exc)
     else:
         log.warning("Model not found at %s, training a new one...", path)
-        from ml.train import train
-        _model = train(path, verbose=False)
+    from ml.train import train
+    _model = train(path, verbose=False)
     return _model
 
 
